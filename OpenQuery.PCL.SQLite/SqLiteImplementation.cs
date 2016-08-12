@@ -14,7 +14,7 @@ namespace OpenQuery.PCL.SQLite
         public string Lesser => "<";
         public string IsEqual => "=";
         public string In => "IN";
-        public string NotIn => "IN";
+        public string NotIn => "NOT IN";
         public string Greater => ">";
         public string WildCard => "*";
         public string Select => "SELECT";

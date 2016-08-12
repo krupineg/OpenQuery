@@ -54,7 +54,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DifferentModel.cs" />
     <Compile Include="Model.cs" />
+    <Compile Include="PropertyExtractorTest.cs" />
     <Compile Include="SqliteQueryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

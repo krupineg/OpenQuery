@@ -7,23 +7,9 @@ using OpenQuery.PCL.SQLite;
 
 namespace OpenQuery.Test
 {
-
-    [TestFixture]
-    public class PropertyExtractorTest
-    {
-        [Test]
-        public void ExtractTest()
-        {
-            Assert.That("Id", 
-                Is.EqualTo(PropertyExtractor.GetPropertyInfo<Model, int>(x => x.Id).Name));
-        }
-
-    }
-
     [TestFixture]
     public class SqliteQueryTest
     {
-
         [Test]
         public void SelectAllFieldsTest()
         {
@@ -39,6 +25,18 @@ namespace OpenQuery.Test
                 Is.EqualTo(starListSelect));
             Assert.That(starListSelect, 
                 Is.EqualTo("SELECT * FROM Model"));
+        }
+
+
+
+        [Test]
+        public void QueryEqualsBuildResult()
+        {
+            var starSelect = Query.With<SqLiteImplementation>()
+                .Select()
+                .From<Model>();
+            Assert.That(starSelect.Query,
+                Is.EqualTo(starSelect.Build()));
         }
 
         [Test]
@@ -138,6 +136,19 @@ namespace OpenQuery.Test
                 .Build();
             Assert.That(defaultSelect,
                 Is.EqualTo("SELECT Id, Name FROM Model WHERE Id IN (1, 2, 3)"));
+        }
+
+        [Test]
+        public void SelectWhereNotInSimpleTest()
+        {
+            var defaultSelect = Query.With<SqLiteImplementation>()
+                .Select("Id", "Name")
+                .From<Model>()
+                .Where()
+                .IsNotIn<Model, int>(x => x.Id, 1, 2, 3)
+                .Build();
+            Assert.That(defaultSelect,
+                Is.EqualTo("SELECT Id, Name FROM Model WHERE Id NOT IN (1, 2, 3)"));
         }
 
         [Test]

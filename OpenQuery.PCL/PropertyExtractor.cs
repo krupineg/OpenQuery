@@ -26,7 +26,7 @@ namespace OpenQuery.PCL
             if (type != propInfo.DeclaringType.GetTypeInfo() &&
                 !type.IsSubclassOf(propInfo.DeclaringType))
                 throw new ArgumentException(string.Format(
-                    "Expresion '{0}' refers to a property that is not from type {1}.",
+                    "Expression '{0}' refers to a property that is not from type {1}.",
                     propertyLambda.ToString(),
                     type));
 

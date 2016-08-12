@@ -38,7 +38,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstract\IAvailableNewWhereClause.cs" />
+    <Compile Include="Abstract\IFromQuery.cs" />
+    <Compile Include="Abstract\IReadyToBuildQuery.cs" />
+    <Compile Include="Abstract\IQueryBaseHidden.cs" />
+    <Compile Include="Abstract\IQueryHidden.cs" />
     <Compile Include="Abstract\ISelectedQuery.cs" />
+    <Compile Include="Abstract\ISelectedQueryHidden.cs" />
     <Compile Include="Abstract\WhereTokenBase.cs" />
     <Compile Include="Abstract\IAvailableWhereQuery.cs" />
     <Compile Include="Abstract\IHaveWhereClause.cs" />

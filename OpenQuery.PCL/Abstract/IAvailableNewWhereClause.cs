@@ -1,6 +1,6 @@
 namespace OpenQuery.PCL.Abstract
 {
-    public interface IAvailableNewWhereClause:IQueryBase
+    public interface IAvailableNewWhereClause:IQueryBase, IReadyToBuildQuery
     {
         
     }

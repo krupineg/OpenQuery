@@ -8,7 +8,7 @@ using OpenQuery.PCL.Tokens;
 namespace OpenQuery.PCL
 {
     internal class Q<TImplementation> :
-        IHaveWhereClause, IQuery, IWhereQuery, IAvailableWhereQuery, IAvailableNewWhereClause, ISelectedQueryHidden, IQueryBaseHidden, IQueryHidden
+        IHaveWhereClause, IQuery, IFromQuery, IWhereQuery, IAvailableWhereQuery, IAvailableNewWhereClause, ISelectedQueryHidden, IQueryBaseHidden, IQueryHidden
         where TImplementation: ISqlImplementation, new()
     {
         public string Query

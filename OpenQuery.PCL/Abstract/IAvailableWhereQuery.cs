@@ -4,4 +4,5 @@ namespace OpenQuery.PCL.Abstract
     {
 
     }
+    
 }

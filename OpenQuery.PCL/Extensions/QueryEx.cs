@@ -9,7 +9,7 @@ namespace OpenQuery.PCL.Extensions
 {
     public static class QueryEx
     {
-        public static IAvailableWhereQuery Where(this IAvailableWhereQuery query)
+        public static IAvailableWhereQuery Where(this IFromQuery query)
         {
             return query as IAvailableWhereQuery;
         }
@@ -35,9 +35,9 @@ namespace OpenQuery.PCL.Extensions
             return Select(query, fields.ToArray());
         }
 
-        public static IAvailableWhereQuery From<T>(this ISelectedQuery query)
+        public static IFromQuery From<T>(this ISelectedQuery query)
         {
-            return query.Cast<ISelectedQueryHidden>().From<T>();
+            return query.Cast<ISelectedQueryHidden>().From<T>().Cast<IFromQuery>();
         }
 
         public static IAvailableNewWhereClause IsGreater<TSource, TProperty>
