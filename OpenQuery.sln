@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenQuery.PCL", "OpenQuery.PCL\OpenQuery.PCL.csproj", "{DA9181C8-B683-4F60-AB28-9AC17F34A80C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenQuery.Test", "OpenQuery.Test\OpenQuery.Test.csproj", "{989525F0-738A-42B9-A6BF-A1AFBFB3F124}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenQuery.PCL.SQLite", "OpenQuery.PCL.SQLite\OpenQuery.PCL.SQLite.csproj", "{5EC874C6-065E-4771-9602-F8650F5A3FD5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA9181C8-B683-4F60-AB28-9AC17F34A80C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA9181C8-B683-4F60-AB28-9AC17F34A80C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA9181C8-B683-4F60-AB28-9AC17F34A80C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA9181C8-B683-4F60-AB28-9AC17F34A80C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{989525F0-738A-42B9-A6BF-A1AFBFB3F124}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{989525F0-738A-42B9-A6BF-A1AFBFB3F124}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{989525F0-738A-42B9-A6BF-A1AFBFB3F124}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{989525F0-738A-42B9-A6BF-A1AFBFB3F124}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EC874C6-065E-4771-9602-F8650F5A3FD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EC874C6-065E-4771-9602-F8650F5A3FD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EC874C6-065E-4771-9602-F8650F5A3FD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EC874C6-065E-4771-9602-F8650F5A3FD5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
