@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
-using OpenQuery.PCL;
+using OpenQuery.Core;
 using Assert = NUnit.Framework.Assert;
 using System.Collections.Generic;
-using OpenQuery.PCL.Extensions;
-using OpenQuery.PCL.SQLite;
+using OpenQuery.Core.Extensions;
+using OpenQuery.SQLite;
 
 namespace OpenQuery.Test
 {

@@ -1,5 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace OpenQuery.Test
 {
     public class DifferentModel
@@ -9,6 +7,6 @@ namespace OpenQuery.Test
             return 0;
         }
 
-        public int AnotherProperty { get; set; }
+        public int AnotherProperty => 0;
     }
 }
