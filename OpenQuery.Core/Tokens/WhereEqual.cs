@@ -3,18 +3,19 @@ using OpenQuery.Core.Abstract;
 
 namespace OpenQuery.Core.Tokens
 {
-    internal class WhereEqual<T> : WhereTokenBase<T>
+    internal class WhereEqual<TSource, T> : WhereTokenBase<TSource, T>
     {
-        internal WhereEqual(ISqlImplementation implementation, string name, T val) : base(implementation, name, val)
+        internal WhereEqual(ISqlDialect dialect, string name, T val) 
+            : base(dialect, name, val)
         {
         }
 
         public override StringBuilder GetSign()
         {
             return new StringBuilder()
-                .Append(Implementation.WhiteSpace)
-                .Append(Implementation.IsEqual)
-                .Append(Implementation.WhiteSpace);
+                .Append(Dialect.WhiteSpace)
+                .Append(Dialect.IsEqual)
+                .Append(Dialect.WhiteSpace);
         }
     }
 }

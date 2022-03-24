@@ -3,12 +3,12 @@ using OpenQuery.Core.Abstract;
 
 namespace OpenQuery.SQLite
 {
-    public class SqLiteImplementation : ISqlImplementation
+    public class SqLiteDialect : ISqlDialect
     {
         public string Or => "OR";
         public string And => "AND";
         public string Like => "LIKE";
-        public string Lesser => "<";
+        public string Less => "<";
         public string IsEqual => "=";
         public string In => "IN";
         public string NotIn => "NOT IN";
@@ -17,6 +17,7 @@ namespace OpenQuery.SQLite
         public string Select => "SELECT";
         public string Where => "WHERE";
         public string From => "FROM";
+        public string Count => "COUNT";
         public string FieldsSeparator => ", ";
         public string WhiteSpace => " ";
         public string OpenSubquery => "(";
@@ -29,7 +30,7 @@ namespace OpenQuery.SQLite
             return sb;
         }
 
-        public string JoinFields(List<string> fields)
+        public string JoinFields(IReadOnlyCollection<string> fields)
         {
             return string.Join(FieldsSeparator, fields);
         }

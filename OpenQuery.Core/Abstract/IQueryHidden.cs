@@ -2,7 +2,6 @@
 {
     public interface IQueryHidden : IQuery
     {
-        ISelectedQuery Select(IList<string> fields);
-        ISelectedQuery Select(params string[] fields);
+        ISelectedQuery Select(Func<SelectClauseFactory, SelectExpression> expression);
     }
 }

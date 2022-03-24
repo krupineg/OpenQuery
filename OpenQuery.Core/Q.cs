@@ -1,3 +1,6 @@
+using System.Collections.Immutable;
+using System.Data.Common;
+using System.Diagnostics.Contracts;
 using System.Text;
 using OpenQuery.Core.Abstract;
 using OpenQuery.Core.Tokens;
@@ -6,7 +9,7 @@ namespace OpenQuery.Core
 {
     internal class Q<TImplementation> :
         IHaveWhereClause, IQuery, IFromQuery, IWhereQuery, IAvailableWhereQuery, IAvailableNewWhereClause, ISelectedQueryHidden, IQueryBaseHidden, IQueryHidden
-        where TImplementation: ISqlImplementation, new()
+        where TImplementation: ISqlDialect, new()
     {
         public string Query
         {
@@ -20,52 +23,41 @@ namespace OpenQuery.Core
             }
         }
 
-        private readonly TImplementation _implementation;
+        private readonly TImplementation _dialect;
         private string _table = string.Empty;
         private readonly ICollection<TokenBase> _whereTokens = new List<TokenBase>();
-        private List<string> _fields = new ();
-        private string[] _availableFields = Array.Empty<string>();
+        private readonly List<SelectExpression> _selectExpressions = new ();
+        private readonly ISet<string> _availableFields = new HashSet<string>();
+        private readonly ISet<string> _alias = new HashSet<string>();
         private string _query;
 
         public Q()
         {
-            _implementation = new TImplementation();
-        }
-
-        public ISelectedQuery Select(IList<string> fields)
-        {
-            _fields = new HashSet<string>(fields).ToList();
-            return this;
-        }
-
-        public ISelectedQuery Select(string fields)
-        {
-            _fields = new HashSet<string>(fields.Split(',').Select(x => x.Trim())).ToList();
-            return this;
-        }
-
-        public ISelectedQuery Select(params string[] fields)
-        {
-            if (!fields.Any())
-            {
-                return Select(_implementation.WildCard);
-            }
-            else
-            {
-                return Select(fields.ToList());
-            }
+            _dialect = new TImplementation();
+            _availableFields.Add(_dialect.WildCard);
         }
         
-        public IAvailableWhereQuery From<T>()
+        public ISelectedQuery Select(Func<SelectClauseFactory, SelectExpression> func)
         {
-            var type = typeof (T);
-            return From(type);
+            _selectExpressions.Add(func(new SelectClauseFactory(_availableFields)));
+            return this;
         }
 
-        public IAvailableWhereQuery From(Type type)
+        public IAvailableWhereQuery From<T>()
         {
-            _table = type.Name;
-            _availableFields = QueryFieldsCache.GetProperties(type);
+            return From<T>(Array.Empty<string>());
+        }
+        
+        public IAvailableWhereQuery From<T>(params string[] domain)
+        {
+            var type = typeof (T);
+            _table = string.Join('.', domain.Append(type.Name));
+
+            foreach (var field in QueryFieldsCache.GetProperties(type))
+            {
+                _availableFields.Add(field);
+            }
+            
             return this;
         }
 
@@ -77,34 +69,42 @@ namespace OpenQuery.Core
 
         public IQuery AndWhere()
         {
-            _whereTokens.Add(new And(_implementation));
+            _whereTokens.Add(new And(_dialect));
             return this;
         }
 
         public IQuery OrWhere()
         {
-            _whereTokens.Add(new Or(_implementation));
+            _whereTokens.Add(new Or(_dialect));
+            return this;
+        }
+
+        public IReadyToBuildQuery As(string alias)
+        {
+            Contract.Assert(_alias.Count < 1, "there could be only one alias");
+            _alias.Add(alias);
             return this;
         }
 
 
-        public ISqlImplementation Implementation => _implementation;
+        public ISqlDialect Dialect => _dialect;
 
         public string Build()
         {
-            _fields = _fields.Intersect(_availableFields).ToList();
-            if (!_fields.Any())
-            {
-                _fields.Add(_implementation.WildCard);
-            }
             var sb = new StringBuilder();
             sb
-                .Append(_implementation.Select).Append(_implementation.WhiteSpace)
-                .Append(_implementation.JoinFields(_fields))
-                .Append(_implementation.WhiteSpace)
-                .Append(_implementation.From).Append(_implementation.WhiteSpace)
+                .Append(_dialect.Select).Append(_dialect.WhiteSpace)
+                .Append(_selectExpressions.Single().Invoke(_dialect))
+                .Append(_dialect.WhiteSpace)
+                .Append(_dialect.From).Append(_dialect.WhiteSpace)
                 .Append(_table);
             sb.Append(GetWhereStringBuilder());
+
+            foreach (var alias in _alias)
+            {
+                sb.Append($" as {alias}");
+            }
+            
             _query = sb.ToString();
             return Query;
         }
@@ -116,15 +116,12 @@ namespace OpenQuery.Core
             {
                 foreach (var whereToken in _whereTokens)
                 {
-                    if (whereToken.IsAvailable(_availableFields, sb))
-                    {
-                        sb.Append(_implementation.WhiteSpace).Append(whereToken.Build());
-                    }
+                    sb.Append(_dialect.WhiteSpace).Append(whereToken.Build());
                 }
             }
             if (sb.Length > 0)
             {
-                sb.Insert(0, _implementation.Where).Insert(0, _implementation.WhiteSpace);
+                sb.Insert(0, _dialect.Where).Insert(0, _dialect.WhiteSpace);
             }
             return sb;
         }

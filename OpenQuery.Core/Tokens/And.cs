@@ -8,17 +8,11 @@ namespace OpenQuery.Core.Tokens
 
         public override string Build()
         {
-            return Implementation.And;
+            return Dialect.And;
         }
 
-        internal override bool IsAvailable(string[] availableFilds, StringBuilder sb)
+        public And(ISqlDialect dialect) : base(dialect)
         {
-            return sb.Length > 0;
-        }
-
-        public And(ISqlImplementation implementation) : base(implementation)
-        {
-
         }
     }
 }

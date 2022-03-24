@@ -1,24 +1,23 @@
 ﻿using NUnit.Framework;
 using OpenQuery.Core;
 using Assert = NUnit.Framework.Assert;
-using System.Collections.Generic;
 using OpenQuery.Core.Extensions;
 using OpenQuery.SQLite;
 
 namespace OpenQuery.Test
 {
     [TestFixture]
-    public class SqliteQueryTest
+    public class DefaultSqlQueryTest
     {
         [Test]
         public void SelectAllFieldsTest()
         {
-            var starSelect = Query.With<SqLiteImplementation>()
-                .Select("*")
+            var starSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Everything())
                 .From<Model>()
                 .Build();
-            var starListSelect = Query.With<SqLiteImplementation>()
-                .Select(new List<string> { "*" })
+            var starListSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("*"))
                 .From<Model>()
                 .Build();
             Assert.That(starSelect, 
@@ -32,8 +31,8 @@ namespace OpenQuery.Test
         [Test]
         public void QueryEqualsBuildResult()
         {
-            var starSelect = Query.With<SqLiteImplementation>()
-                .Select()
+            var starSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Everything())
                 .From<Model>();
             Assert.That(starSelect.Query,
                 Is.EqualTo(starSelect.Build()));
@@ -42,16 +41,10 @@ namespace OpenQuery.Test
         [Test]
         public void SelectListOfFieldsTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
                 .Build();
-            var starSelect = Query.With<SqLiteImplementation>()
-                .Select(new List<string> { "Id", "Name" })
-                .From<Model>()
-                .Build();
-            Assert.That(defaultSelect, 
-                Is.EqualTo(starSelect));
             Assert.That(defaultSelect,
                 Is.EqualTo("SELECT Id, Name FROM Model"));
         }
@@ -59,28 +52,48 @@ namespace OpenQuery.Test
         [Test]
         public void SelectListOfFieldsWithWrongFieldTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name", "wrong_field")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name", "wrong_field"))
                 .From<Model>()
                 .Build();
-            var starSelect = Query.With<SqLiteImplementation>()
-                .Select(new List<string> { "Id", "Name", "wrong_field" })
-                .From<Model>()
-                .Build();
-            Assert.That(defaultSelect, 
-                Is.EqualTo(starSelect));
             Assert.That(defaultSelect,
                 Is.EqualTo("SELECT Id, Name FROM Model"));
         }
-
+        
+        [Test]
+        public void SelectWhereEqualsWithAliasSimpleTest()
+        {
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
+                .From<Model>()
+                .Where()
+                .AreEqual<Model>(x => x.Id, 1)
+                .As("a")
+                .Build();
+            Assert.That(defaultSelect, 
+                Is.EqualTo("SELECT Id, Name FROM Model WHERE Id = 1 as a"));
+        }
         [Test]
         public void SelectWhereEqualsSimpleTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
                 .Where()
                 .AreEqual<Model, int>(x => x.Id, 1)
+                .Build();
+            Assert.That(defaultSelect, 
+                Is.EqualTo("SELECT Id, Name FROM Model WHERE Id = 1"));
+        }
+        
+        [Test]
+        public void SelectWhereEqualsSimpleTest2()
+        {
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
+                .From<Model>()
+                .Where()
+                .AreEqual<Model>(x => x.Id, 1)
                 .Build();
             Assert.That(defaultSelect, 
                 Is.EqualTo("SELECT Id, Name FROM Model WHERE Id = 1"));
@@ -89,8 +102,8 @@ namespace OpenQuery.Test
         [Test]
         public void SelectWhereGreaterSimpleTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
                 .Where()
                 .IsGreater<Model, int>(x => x.Id, 1)
@@ -100,13 +113,13 @@ namespace OpenQuery.Test
         }
 
         [Test]
-        public void SelectWhereLesserSimpleTest()
+        public void SelectWhereLessThanSimpleTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
                 .Where()
-                .IsLesser<Model, int>(x => x.Id, 1)
+                .IsLess<Model, int>(x => x.Id, 1)
                 .Build();
             Assert.That(defaultSelect, 
                 Is.EqualTo("SELECT Id, Name FROM Model WHERE Id < 1"));
@@ -115,21 +128,21 @@ namespace OpenQuery.Test
         [Test]
         public void SelectWhereLikeSimpleTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
                 .Where()
-                .IsLike<Model, int>(x => x.Id, 1)
+                .IsLike<Model>(x => x.Name, "1")
                 .Build();
             Assert.That(defaultSelect,
-                Is.EqualTo("SELECT Id, Name FROM Model WHERE Id LIKE 1"));
+                Is.EqualTo("SELECT Id, Name FROM Model WHERE Name LIKE '1'"));
         }
 
         [Test]
         public void SelectWhereInSimpleTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
                 .Where()
                 .IsIn<Model, int>(x => x.Id, 1, 2, 3)
@@ -141,8 +154,8 @@ namespace OpenQuery.Test
         [Test]
         public void SelectWhereNotInSimpleTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
                 .Where()
                 .IsNotIn<Model, int>(x => x.Id, 1, 2, 3)
@@ -154,8 +167,8 @@ namespace OpenQuery.Test
         [Test]
         public void SelectWhereEqualOrEqualSimpleTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
                 .Where()
                 .AreEqual<Model, int>(x => x.Id, 1)
@@ -169,15 +182,42 @@ namespace OpenQuery.Test
         [Test]
         public void SelectWhereEqualAndLessSimpleTest()
         {
-            var defaultSelect = Query.With<SqLiteImplementation>()
-                .Select("Id", "Name")
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
-                .Where().AreEqual<Model, string>(x => x.Name, "'somename'")
+                .Where().AreEqual<Model>(x => x.Name, "somename")
                 .And()
-                .IsLesser<Model, int>(x => x.Id, 2)
+                .IsLess<Model, int>(x => x.Id, 2)
                 .Build();
             Assert.That(defaultSelect, 
                 Is.EqualTo("SELECT Id, Name FROM Model WHERE Name = 'somename' AND Id < 2"));
         }
+        
+        [Test]
+        public void SelectCount()
+        {
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Count())
+                .From<Model>()
+                .Where()
+                .IsNotIn<Model, int>(x => x.Id, 1, 2, 3)
+                .Build();
+            Assert.That(defaultSelect,
+                Is.EqualTo("SELECT COUNT(*) FROM Model WHERE Id NOT IN (1, 2, 3)"));
+        }
+        
+        [Test]
+        public void SelectWithDomain()
+        {
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Everything())
+                .From<Model>("domain")
+                .Where()
+                .IsNotIn<Model, int>(x => x.Id, 1, 2, 3)
+                .Build();
+            Assert.That(defaultSelect,
+                Is.EqualTo("SELECT * FROM domain.Model WHERE Id NOT IN (1, 2, 3)"));
+        }
+
     }
 }

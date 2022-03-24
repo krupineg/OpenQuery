@@ -7,15 +7,10 @@ namespace OpenQuery.Core.Tokens
     {
         public override string Build()
         {
-            return Implementation.Or;
+            return Dialect.Or;
         }
 
-        internal override bool IsAvailable(string[] availableFilds, StringBuilder sb)
-        {
-            return sb.Length > 0;
-        }
-
-        public Or(ISqlImplementation implementation) : base(implementation)
+        public Or(ISqlDialect dialect) : base(dialect)
         {
         }
     }

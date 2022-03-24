@@ -20,8 +20,8 @@ namespace OpenQuery.Test
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                Query.With<SqLiteImplementation>()
-                    .Select("Id", "Name")
+                Query.With<SqLiteDialect>()
+                    .Select(x => x.Fields("Id", "Name"))
                     .From<Model>()
                     .Where()
                     .IsNotIn<Model, int>(x => x.Field, 1, 2, 3)
@@ -34,8 +34,8 @@ namespace OpenQuery.Test
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                Query.With<SqLiteImplementation>()
-                    .Select("Id", "Name")
+                Query.With<SqLiteDialect>()
+                    .Select(x => x.Fields("Id", "Name"))
                     .From<Model>()
                     .Where()
                     .IsNotIn<Model, int>(x => new DifferentModel().Method(), 1, 2, 3)
@@ -48,8 +48,8 @@ namespace OpenQuery.Test
         {
             Assert.Throws<ArgumentException>(() =>
                 {
-                    Query.With<SqLiteImplementation>()
-                        .Select("Id", "Name")
+                    Query.With<SqLiteDialect>()
+                        .Select(x => x.Fields("Id", "Name"))
                         .From<Model>()
                         .Where()
                         .IsNotIn<Model, int>(x => new DifferentModel().AnotherProperty, 1, 2, 3)

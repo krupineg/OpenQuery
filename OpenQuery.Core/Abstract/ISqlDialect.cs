@@ -2,12 +2,12 @@
 
 namespace OpenQuery.Core.Abstract
 {
-    public interface ISqlImplementation
+    public interface ISqlDialect
     {
         string Or { get; }
         string And { get; }
         string Like { get; }
-        string Lesser { get; }
+        string Less { get; }
         string IsEqual { get; }
         string In { get; }
         string NotIn { get; }
@@ -16,11 +16,12 @@ namespace OpenQuery.Core.Abstract
         string Select { get; }
         string Where { get; }
         string From { get; }
+        string Count { get; }
         string FieldsSeparator { get; }
         string WhiteSpace { get; }
         string OpenSubquery { get; }
         string CloseCloseSubquery { get; }
         StringBuilder CreateIn<T>(T[] value);
-        string JoinFields(List<string> fields);
+        string JoinFields(IReadOnlyCollection<string> fields);
     }
 }

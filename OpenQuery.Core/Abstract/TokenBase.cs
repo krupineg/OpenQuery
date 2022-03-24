@@ -4,14 +4,12 @@ namespace OpenQuery.Core.Abstract
 {
     public abstract class TokenBase
     {
-        protected readonly ISqlImplementation Implementation;
+        protected readonly ISqlDialect Dialect;
 
-        protected TokenBase(ISqlImplementation implementation)
+        protected TokenBase(ISqlDialect dialect)
         {
-            Implementation = implementation;
+            Dialect = dialect;
         }
-
-        internal abstract bool IsAvailable(string[] availableFields, StringBuilder sb);
         public abstract string Build();
     }
 }
