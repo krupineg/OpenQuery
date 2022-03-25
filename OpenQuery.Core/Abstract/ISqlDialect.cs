@@ -18,6 +18,7 @@ namespace OpenQuery.Core.Abstract
         string From { get; }
         string Count { get; }
         string FieldsSeparator { get; }
+        string DomainSeparator { get; }
         string WhiteSpace { get; }
         string OpenSubquery { get; }
         string CloseSubquery { get; }

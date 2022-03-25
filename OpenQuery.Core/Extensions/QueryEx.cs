@@ -40,10 +40,10 @@ namespace OpenQuery.Core.Extensions
         {
             return AreEqual<TSource, long>(query, func, value);
         }
-        public static IReadyToBuildQuery As(this IAvailableNewWhereClause query,
+        public static IFromQuery As(this IFromQuery query,
             string alias)
         {
-            return query.Cast<IHaveWhereClause>().As(alias);
+            return query.As(alias);
         }
         
         public static ISelectedQuery Select(this IQueryBase query, Func<SelectClauseFactory, SelectExpression> func)
@@ -51,6 +51,11 @@ namespace OpenQuery.Core.Extensions
             return query.Cast<IQueryHidden>().Select(func);
         }
 
+        public static IFromQuery From(this ISelectedQuery query, Func<IReadyToBuildQuery> subQuery)
+        {
+            return query.Cast<ISelectedQueryHidden>().From(subQuery).Cast<IFromQuery>();
+        }
+        
         public static IFromQuery From<T>(this ISelectedQuery query)
         {
             return query.Cast<ISelectedQueryHidden>().From<T>().Cast<IFromQuery>();

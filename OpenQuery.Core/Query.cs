@@ -5,9 +5,9 @@ namespace OpenQuery.Core
 {
     public static class Query
     {
-        public static IQueryBase With<TImplementation>() where TImplementation : ISqlDialect, new()
+        public static IQueryBase With<TDialect>() where TDialect : ISqlDialect, new()
         {
-            return new Q<TImplementation>();
+            return new Q<TDialect>();
         }
     }
 }

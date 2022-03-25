@@ -66,12 +66,27 @@ namespace OpenQuery.Test
             var defaultSelect = Query.With<SqLiteDialect>()
                 .Select(x => x.Fields("Id", "Name"))
                 .From<Model>()
+                .As("a")
                 .Where()
                 .AreEqual<Model>(x => x.Id, 1)
-                .As("a")
                 .Build();
             Assert.That(defaultSelect, 
-                Is.EqualTo("SELECT Id, Name FROM Model WHERE Id = 1 as a"));
+                Is.EqualTo("SELECT Id, Name FROM Model as a WHERE Id = 1"));
+        }
+        
+        [Test]
+        public void SelectFromSubQuery()
+        {
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Everything())
+                .From(() => Query.With<Default>().Select(x => x.Fields("Id")).From<Model>())
+                .As("a")
+                .Where()
+                .AreEqual<Model>(x => x.Id, 1)
+                .Build();
+
+            Assert.That(defaultSelect, 
+                Is.EqualTo("SELECT * FROM (SELECT Id FROM Model) as a WHERE Id = 1"));
         }
         [Test]
         public void SelectWhereEqualsSimpleTest()
@@ -118,12 +133,12 @@ namespace OpenQuery.Test
             var defaultSelect = Query.With<SqLiteDialect>()
                 .Select(x => x.Function("TO_JSON", "t"))
                 .From<Model>()
+                .As("t")
                 .Where()
                 .IsGreater<Model, int>(x => x.Id, 1)
-                .As("t")
                 .Build();
             Assert.That(defaultSelect, 
-                Is.EqualTo("SELECT TO_JSON(t) FROM Model WHERE Id > 1 as t"));
+                Is.EqualTo("SELECT TO_JSON(t) FROM Model as t WHERE Id > 1"));
         }
 
         [Test]

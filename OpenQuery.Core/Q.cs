@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-using System.Data.Common;
 using System.Diagnostics.Contracts;
 using System.Text;
 using OpenQuery.Core.Abstract;
@@ -7,9 +5,9 @@ using OpenQuery.Core.Tokens;
 
 namespace OpenQuery.Core
 {
-    internal class Q<TImplementation> :
+    internal class Q<TDialect> :
         IHaveWhereClause, IQuery, IFromQuery, IWhereQuery, IAvailableWhereQuery, IAvailableNewWhereClause, ISelectedQueryHidden, IQueryBaseHidden, IQueryHidden
-        where TImplementation: ISqlDialect, new()
+        where TDialect: ISqlDialect, new()
     {
         public string Query
         {
@@ -23,8 +21,8 @@ namespace OpenQuery.Core
             }
         }
 
-        private readonly TImplementation _dialect;
-        private string _table = string.Empty;
+        private readonly TDialect _dialect;
+        private string _source = string.Empty;
         private readonly ICollection<TokenBase> _whereTokens = new List<TokenBase>();
         private readonly List<SelectExpression> _selectExpressions = new ();
         private readonly ISet<string> _availableFields = new HashSet<string>();
@@ -33,13 +31,19 @@ namespace OpenQuery.Core
 
         public Q()
         {
-            _dialect = new TImplementation();
+            _dialect = new TDialect();
             _availableFields.Add(_dialect.WildCard);
         }
         
         public ISelectedQuery Select(Func<SelectClauseFactory, SelectExpression> func)
         {
             _selectExpressions.Add(func(new SelectClauseFactory(_availableFields)));
+            return this;
+        }
+
+        public IAvailableWhereQuery From(Func<IReadyToBuildQuery> subQuery)
+        {
+            _source = $"{_dialect.OpenSubquery}{subQuery().Build()}{_dialect.CloseSubquery}";
             return this;
         }
 
@@ -51,7 +55,7 @@ namespace OpenQuery.Core
         public IAvailableWhereQuery From<T>(params string[] domain)
         {
             var type = typeof (T);
-            _table = string.Join('.', domain.Append(type.Name));
+            _source = string.Join(_dialect.DomainSeparator, domain.Append(type.Name));
 
             foreach (var field in QueryFieldsCache.GetProperties(type))
             {
@@ -79,7 +83,7 @@ namespace OpenQuery.Core
             return this;
         }
 
-        public IReadyToBuildQuery As(string alias)
+        public IFromQuery As(string alias)
         {
             Contract.Assert(_alias.Count < 1, "there could be only one alias");
             _alias.Add(alias);
@@ -97,13 +101,14 @@ namespace OpenQuery.Core
                 .Append(_selectExpressions.Single().Invoke(_dialect))
                 .Append(_dialect.WhiteSpace)
                 .Append(_dialect.From).Append(_dialect.WhiteSpace)
-                .Append(_table);
-            sb.Append(GetWhereStringBuilder());
-
+                .Append(_source);
+            
             foreach (var alias in _alias)
             {
                 sb.Append($" as {alias}");
             }
+            
+            sb.Append(GetWhereStringBuilder());
             
             _query = sb.ToString();
             return Query;

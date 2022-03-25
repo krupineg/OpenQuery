@@ -15,26 +15,26 @@ public class SelectClauseFactory
         
     public SelectExpression Everything()
     {
-        return (implementation) => implementation.WildCard;
+        return (dialect) => dialect.WildCard;
     }
 
     public SelectExpression Fields(params string[] fields)
     {
         Contract.Assert(fields.Length > 0, "you should provide non-empty fields list");
-        return (implementation) => implementation.JoinFields(_availableFields.Intersect(fields).ToList());
+        return (dialect) => dialect.JoinFields(_availableFields.Intersect(fields).ToList());
     }
     
     public SelectExpression Function(string function, params string[] arguments)
     {
-        return (implementation) => new StringBuilder(function)
-            .Append(implementation.OpenSubquery)
-            .Append(implementation.JoinFields(arguments))
-            .Append(implementation.CloseSubquery)
+        return (dialect) => new StringBuilder(function)
+            .Append(dialect.OpenSubquery)
+            .Append(dialect.JoinFields(arguments))
+            .Append(dialect.CloseSubquery)
             .ToString();
     }
             
     public SelectExpression Count()
     {
-        return (implementation) => $"{implementation.Count}{implementation.OpenSubquery}{implementation.WildCard}{implementation.CloseSubquery}";
+        return (dialect) => $"{dialect.Count}{dialect.OpenSubquery}{dialect.WildCard}{dialect.CloseSubquery}";
     }
 }

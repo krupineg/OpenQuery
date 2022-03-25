@@ -19,6 +19,7 @@ namespace OpenQuery.SQLite
         public string From => "FROM";
         public string Count => "COUNT";
         public string FieldsSeparator => ", ";
+        public string DomainSeparator => ".";
         public string WhiteSpace => " ";
         public string OpenSubquery => "(";
         public string CloseSubquery => ")";

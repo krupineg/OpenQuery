@@ -4,6 +4,5 @@ namespace OpenQuery.Core.Abstract
     {
         IQuery AndWhere();
         IQuery OrWhere();
-        IReadyToBuildQuery As(string alias);
     }
 }
