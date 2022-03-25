@@ -21,12 +21,12 @@ public class Default : ISqlDialect
     public string FieldsSeparator => ", ";
     public string WhiteSpace => " ";
     public string OpenSubquery => "(";
-    public string CloseCloseSubquery => ")";
+    public string CloseSubquery => ")";
 
     public StringBuilder CreateIn<T>(T[] value)
     {
         var sb = new StringBuilder();
-        sb.Append(OpenSubquery).Append(string.Join(FieldsSeparator, value)).Append(CloseCloseSubquery);
+        sb.Append(OpenSubquery).Append(string.Join(FieldsSeparator, value)).Append(CloseSubquery);
         return sb;
     }
 

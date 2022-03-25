@@ -20,7 +20,7 @@ namespace OpenQuery.Core.Abstract
         string FieldsSeparator { get; }
         string WhiteSpace { get; }
         string OpenSubquery { get; }
-        string CloseCloseSubquery { get; }
+        string CloseSubquery { get; }
         StringBuilder CreateIn<T>(T[] value);
         string JoinFields(IReadOnlyCollection<string> fields);
     }

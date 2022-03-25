@@ -111,6 +111,20 @@ namespace OpenQuery.Test
             Assert.That(defaultSelect, 
                 Is.EqualTo("SELECT Id, Name FROM Model WHERE Id > 1"));
         }
+        
+        [Test]
+        public void FunctionCallShoudWork()
+        {
+            var defaultSelect = Query.With<SqLiteDialect>()
+                .Select(x => x.Function("TO_JSON", "t"))
+                .From<Model>()
+                .Where()
+                .IsGreater<Model, int>(x => x.Id, 1)
+                .As("t")
+                .Build();
+            Assert.That(defaultSelect, 
+                Is.EqualTo("SELECT TO_JSON(t) FROM Model WHERE Id > 1 as t"));
+        }
 
         [Test]
         public void SelectWhereLessThanSimpleTest()

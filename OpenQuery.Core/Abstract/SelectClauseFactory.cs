@@ -1,4 +1,5 @@
 using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace OpenQuery.Core.Abstract;
 
@@ -22,9 +23,18 @@ public class SelectClauseFactory
         Contract.Assert(fields.Length > 0, "you should provide non-empty fields list");
         return (implementation) => implementation.JoinFields(_availableFields.Intersect(fields).ToList());
     }
+    
+    public SelectExpression Function(string function, params string[] arguments)
+    {
+        return (implementation) => new StringBuilder(function)
+            .Append(implementation.OpenSubquery)
+            .Append(implementation.JoinFields(arguments))
+            .Append(implementation.CloseSubquery)
+            .ToString();
+    }
             
     public SelectExpression Count()
     {
-        return (implementation) => $"{implementation.Count}{implementation.OpenSubquery}{implementation.WildCard}{implementation.CloseCloseSubquery}";
+        return (implementation) => $"{implementation.Count}{implementation.OpenSubquery}{implementation.WildCard}{implementation.CloseSubquery}";
     }
 }
