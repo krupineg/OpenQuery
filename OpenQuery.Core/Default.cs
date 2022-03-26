@@ -23,6 +23,9 @@ public class Default : ISqlDialect
     public string WhiteSpace => " ";
     public string OpenSubquery => "(";
     public string CloseSubquery => ")";
+    public string Alias => "AS";
+    public string Limit => "LIMIT";
+    public string Offset => "OFFSET";
 
     public StringBuilder CreateIn<T>(T[] value)
     {

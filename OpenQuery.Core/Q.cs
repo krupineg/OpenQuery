@@ -27,6 +27,8 @@ namespace OpenQuery.Core
         private readonly List<SelectExpression> _selectExpressions = new ();
         private readonly ISet<string> _availableFields = new HashSet<string>();
         private readonly ISet<string> _alias = new HashSet<string>();
+        private readonly ISet<long> _limits = new HashSet<long>();
+        private readonly ISet<long> _offsets = new HashSet<long>();
         private string _query;
 
         public Q()
@@ -96,19 +98,26 @@ namespace OpenQuery.Core
         public string Build()
         {
             var sb = new StringBuilder();
-            sb
-                .Append(_dialect.Select).Append(_dialect.WhiteSpace)
+            sb.Append(_dialect.Select).Append(_dialect.WhiteSpace)
                 .Append(_selectExpressions.Single().Invoke(_dialect))
                 .Append(_dialect.WhiteSpace)
                 .Append(_dialect.From).Append(_dialect.WhiteSpace)
                 .Append(_source);
             
-            foreach (var alias in _alias)
-            {
-                sb.Append($" as {alias}");
-            }
+            Optional(_dialect.Alias, _alias);
             
             sb.Append(GetWhereStringBuilder());
+            
+            Optional(_dialect.Limit, _limits);
+            Optional(_dialect.Offset, _offsets);
+
+            void Optional<T>(string prefix, ISet<T> values)
+            {
+                foreach (var value in values)
+                {
+                    sb.Append($" {prefix} {value}");
+                }
+            }
             
             _query = sb.ToString();
             return Query;
@@ -129,6 +138,20 @@ namespace OpenQuery.Core
                 sb.Insert(0, _dialect.Where).Insert(0, _dialect.WhiteSpace);
             }
             return sb;
+        }
+
+        public IReadyToBuildQuery Limit(long limit)
+        {
+            Contract.Assert(_limits.Count < 1, "there could be only one limit per query");
+            _limits.Add(limit);
+            return this;
+        }
+
+        public IReadyToBuildQuery Offset(long offset)
+        {
+            Contract.Assert(_offsets.Count < 1, "there could be only one offset per query");
+            _offsets.Add(offset);
+            return this;
         }
     }
 }

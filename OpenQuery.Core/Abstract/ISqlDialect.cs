@@ -22,6 +22,9 @@ namespace OpenQuery.Core.Abstract
         string WhiteSpace { get; }
         string OpenSubquery { get; }
         string CloseSubquery { get; }
+        string Alias { get; }
+        string Limit { get; }
+        string Offset { get; }
         StringBuilder CreateIn<T>(T[] value);
         string JoinFields(IReadOnlyCollection<string> fields);
     }
