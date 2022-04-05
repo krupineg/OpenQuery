@@ -50,7 +50,7 @@ namespace OpenQuery.Test
         public void TableNameShouldBeOverridable()
         {
             var defaultSelect = _query.Select(x => x.Everything())
-                .From(x => x.WithTableName("anotherName"))
+                .From(x => x.WithTableName<Model>("anotherName"))
                 .Build();
             Assert.That(defaultSelect,
                 Is.EqualTo("SELECT * FROM anotherName"));

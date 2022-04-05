@@ -7,7 +7,7 @@ namespace OpenQuery.Core.Clauses;
 
 internal sealed class FromClauseFactory : IFromClauseFactory
 {
-    public FromExpression WithTableName(string alias)
+    public FromExpression WithTableName<T>(string alias)
     {
         return CreateExpression<Object>(alias, Array.Empty<string>());
     }
@@ -25,10 +25,10 @@ internal sealed class FromClauseFactory : IFromClauseFactory
         return CreateExpression<T>(typeof(T).Name, total);
     }
     
-    public FromExpression WithTableNameWithDomain(string alias, string[] domains)
+    public FromExpression WithTableNameWithDomain<T>(string alias, string[] domains)
     {
         Contract.Assert(domains.Length > 0, "you should provide at least one domain");
-        return CreateExpression<Object>(alias, domains);
+        return CreateExpression<T>(alias, domains);
     }
 
     private FromExpression CreateExpression<T>(string tableName, string[] domain) 
