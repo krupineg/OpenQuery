@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using OpenQuery.Core;
 using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Query;
+using OpenQuery.Core.Dialects;
 using Assert = NUnit.Framework.Assert;
 using OpenQuery.Core.Extensions;
 using OpenQuery.SQLite;
@@ -22,11 +24,11 @@ namespace OpenQuery.Test
         public void SelectAllFieldsTest()
         {
             var starSelect =_query.Select(x => x.Everything())
-                .From<Model>()
+                .From(x => x.Default<Model>())
                 .Build();
             var starListSelect = Query.With<SqLiteDialect>()
                 .Select(x => x.Fields("*"))
-                .From<Model>()
+                .From(x => x.Default<Model>())
                 .Build();
             Assert.That(starSelect, 
                 Is.EqualTo(starListSelect));
@@ -34,32 +36,31 @@ namespace OpenQuery.Test
                 Is.EqualTo("SELECT * FROM Model"));
         }
 
-
-
-        [Test]
-        public void QueryEqualsBuildResult()
-        {
-            var starSelect = _query.Select(x => x.Everything())
-                .From<Model>();
-            Assert.That(starSelect.Query,
-                Is.EqualTo(starSelect.Build()));
-        }
-
         [Test]
         public void SelectListOfFieldsTest()
         {
             var defaultSelect = _query.Select(x => x.Fields("Id", "Name"))
-                .From<Model>()
+                .From(x => x.Default<Model>())
                 .Build();
             Assert.That(defaultSelect,
                 Is.EqualTo("SELECT Id, Name FROM Model"));
         }
-
+        
+        [Test]
+        public void TableNameShouldBeOverridable()
+        {
+            var defaultSelect = _query.Select(x => x.Everything())
+                .From(x => x.WithTableName("anotherName"))
+                .Build();
+            Assert.That(defaultSelect,
+                Is.EqualTo("SELECT * FROM anotherName"));
+        }
+        
         [Test]
         public void SelectListOfFieldsWithWrongFieldTest()
         {
             var defaultSelect = _query.Select(x => x.Fields("Id", "Name", "wrong_field"))
-                .From<Model>()
+                .From(x => x.Default<Model>())
                 .Build();
             Assert.That(defaultSelect,
                 Is.EqualTo("SELECT Id, Name FROM Model"));
@@ -69,7 +70,7 @@ namespace OpenQuery.Test
         public void SelectWhereEqualsWithAliasSimpleTest()
         {
             var defaultSelect = _query.Select(x => x.Fields("Id", "Name"))
-                .From<Model>()
+                .From(x => x.Default<Model>())
                 .As("a")
                 .Where()
                 .AreEqual<Model>(x => x.Id, 1)
@@ -82,7 +83,7 @@ namespace OpenQuery.Test
         public void SelectFromSubQuery()
         {
             var defaultSelect = _query.Select(x => x.Everything())
-                .From(() => Query.With<Default>().Select(x => x.Fields("Id")).From<Model>())
+                .From((f) => f.From(Query.With<Default>().Select(x => x.Fields("Id")).From<Model>()))
                 .As("a")
                 .Where()
                 .AreEqual<Model>(x => x.Id, 1)
@@ -258,13 +259,12 @@ namespace OpenQuery.Test
         public void SelectWithDomain()
         {
             var defaultSelect = _query.Select(x => x.Everything())
-                .From<Model>("domain")
+                .From(a => a.WithDomain<Model>("domain"))
                 .Where()
                 .IsNotIn<Model, int>(x => x.Id, 1, 2, 3)
                 .Build();
             Assert.That(defaultSelect,
                 Is.EqualTo("SELECT * FROM domain.Model WHERE Id NOT IN (1, 2, 3)"));
         }
-
     }
 }

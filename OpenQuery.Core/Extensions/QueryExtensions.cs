@@ -1,11 +1,14 @@
 using System.Linq.Expressions;
 using System.Text;
-using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Clauses.From;
+using OpenQuery.Core.Abstract.Clauses.Select;
+using OpenQuery.Core.Abstract.Query;
+using OpenQuery.Core.Reflection;
 using OpenQuery.Core.Tokens;
 
 namespace OpenQuery.Core.Extensions
 {
-    public static class QueryEx
+    public static class QueryExtensions
     {
         public static IAvailableWhereQuery Where(this IFromQuery query)
         {
@@ -40,32 +43,22 @@ namespace OpenQuery.Core.Extensions
         {
             return AreEqual<TSource, long>(query, func, value);
         }
-        public static IFromQuery As(this IFromQuery query,
-            string alias)
-        {
-            return query.As(alias);
-        }
         
-        public static ISelectedQuery Select(this IQueryBase query, Func<SelectClauseFactory, SelectExpression> func)
+        public static ISelectedQuery Select(this IQueryBase query, Func<ISelectClauseFactory, SelectExpression> func)
         {
             return query.Cast<IQueryHidden>().Select(func);
         }
-
-        public static IFromQuery From(this ISelectedQuery query, Func<IReadyToBuildQuery> subQuery)
+        
+        public static IFromQuery From(this ISelectedQuery query, Func<IFromClauseFactory, FromExpression> func)
         {
-            return query.Cast<ISelectedQueryHidden>().From(subQuery).Cast<IFromQuery>();
+            return query.Cast<ISelectedQueryHidden>().From(func).Cast<IFromQuery>();
         }
         
         public static IFromQuery From<T>(this ISelectedQuery query)
         {
-            return query.Cast<ISelectedQueryHidden>().From<T>().Cast<IFromQuery>();
+            return query.Cast<ISelectedQueryHidden>().From(x => x.Default<T>()).Cast<IFromQuery>();
         }
         
-        public static IFromQuery From<T>(this ISelectedQuery query, string domain)
-        {
-            return query.Cast<ISelectedQueryHidden>().From<T>(domain).Cast<IFromQuery>();
-        }
-
         public static IAvailableNewWhereClause IsGreater<TSource, TProperty>
             (this IAvailableWhereQuery query, Expression<Func<TSource, TProperty>> func, TProperty value)
         {
@@ -139,6 +132,11 @@ namespace OpenQuery.Core.Extensions
             query.Cast<IHaveWhereClause>()
                 .AndWhere();
             return query.Cast<IAvailableWhereQuery>(); 
+        }
+
+        private static T Cast<T>(this IQueryBase q) where T : class, IQueryBase
+        {
+            return (q as T)!;
         }
     }
 }

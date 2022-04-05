@@ -1,4 +1,4 @@
-namespace OpenQuery.Core.Abstract
+namespace OpenQuery.Core.Abstract.Query
 {
     public interface IQueryBase
     {

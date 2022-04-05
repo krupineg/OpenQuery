@@ -1,69 +1,53 @@
 using System.Diagnostics.Contracts;
 using System.Text;
-using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Clauses.From;
+using OpenQuery.Core.Abstract.Clauses.Select;
+using OpenQuery.Core.Abstract.Dialect;
+using OpenQuery.Core.Abstract.Query;
+using OpenQuery.Core.Abstract.Tokens;
+using OpenQuery.Core.Clauses;
 using OpenQuery.Core.Tokens;
 
 namespace OpenQuery.Core
 {
     internal class Q<TDialect> :
-        IHaveWhereClause, IQuery, IFromQuery, IWhereQuery, IAvailableWhereQuery, IAvailableNewWhereClause, ISelectedQueryHidden, IQueryBaseHidden, IQueryHidden
+        IHaveWhereClause, 
+        IFromQuery,
+        IWhereQuery,
+        IAvailableWhereQuery, 
+        IAvailableNewWhereClause, 
+        ISelectedQueryHidden,
+        IQueryBaseHidden,
+        IQueryHidden
         where TDialect: ISqlDialect, new()
     {
-        public string Query
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_query))
-                {
-                    _query = Build();
-                }
-                return _query;
-            }
-        }
-
         private readonly TDialect _dialect;
-        private string _source = string.Empty;
+        private readonly List<FromExpression> _sourceExpressions = new();
         private readonly ICollection<TokenBase> _whereTokens = new List<TokenBase>();
         private readonly List<SelectExpression> _selectExpressions = new ();
-        private readonly ISet<string> _availableFields = new HashSet<string>();
         private readonly ISet<string> _alias = new HashSet<string>();
         private readonly ISet<long> _limits = new HashSet<long>();
         private readonly ISet<long> _offsets = new HashSet<long>();
-        private string _query;
 
         public Q()
         {
             _dialect = new TDialect();
-            _availableFields.Add(_dialect.WildCard);
         }
         
-        public ISelectedQuery Select(Func<SelectClauseFactory, SelectExpression> func)
+        public ISelectedQuery Select<T>(Func<SelectClauseFactory, SelectExpression> func)
         {
-            _selectExpressions.Add(func(new SelectClauseFactory(_availableFields)));
+            _selectExpressions.Add(func(new SelectClauseFactory()));
             return this;
-        }
-
-        public IAvailableWhereQuery From(Func<IReadyToBuildQuery> subQuery)
-        {
-            _source = $"{_dialect.OpenSubquery}{subQuery().Build()}{_dialect.CloseSubquery}";
-            return this;
-        }
-
-        public IAvailableWhereQuery From<T>()
-        {
-            return From<T>(Array.Empty<string>());
         }
         
-        public IAvailableWhereQuery From<T>(params string[] domain)
+        public ISelectedQuery Select(Func<ISelectClauseFactory, SelectExpression> expression)
         {
-            var type = typeof (T);
-            _source = string.Join(_dialect.DomainSeparator, domain.Append(type.Name));
-
-            foreach (var field in QueryFieldsCache.GetProperties(type))
-            {
-                _availableFields.Add(field);
-            }
-            
+            _selectExpressions.Add(expression(new SelectClauseFactory()));
+            return this;
+        }
+        public IAvailableWhereQuery From(Func<IFromClauseFactory, FromExpression> func)
+        {
+            _sourceExpressions.Add(func(new FromClauseFactory())); 
             return this;
         }
 
@@ -95,14 +79,19 @@ namespace OpenQuery.Core
 
         public ISqlDialect Dialect => _dialect;
 
+        public FromExpression Source => _sourceExpressions.Single();
+
         public string Build()
         {
             var sb = new StringBuilder();
+                
+            var (table, fields) = Source.Invoke(_dialect);
+            
             sb.Append(_dialect.Select).Append(_dialect.WhiteSpace)
-                .Append(_selectExpressions.Single().Invoke(_dialect))
+                .Append(_selectExpressions.Single().Invoke(_dialect, fields))
                 .Append(_dialect.WhiteSpace)
                 .Append(_dialect.From).Append(_dialect.WhiteSpace)
-                .Append(_source);
+                .Append(table);
             
             Optional(_dialect.Alias, _alias);
             
@@ -119,8 +108,7 @@ namespace OpenQuery.Core
                 }
             }
             
-            _query = sb.ToString();
-            return Query;
+            return sb.ToString();
         }
 
         private StringBuilder GetWhereStringBuilder()

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace OpenQuery.Core.Abstract
+namespace OpenQuery.Core.Abstract.Dialect
 {
     public interface ISqlDialect
     {

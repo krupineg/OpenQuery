@@ -1,4 +1,6 @@
-namespace OpenQuery.Core.Abstract
+using OpenQuery.Core.Abstract.Tokens;
+
+namespace OpenQuery.Core.Abstract.Query
 {
     public interface IWhereQuery : IQueryBase
     {

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Dialect;
 
 namespace OpenQuery.SQLite
 {

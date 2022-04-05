@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Text;
+using OpenQuery.Core.Abstract.Dialect;
+using OpenQuery.Core.Reflection;
 
-namespace OpenQuery.Core.Abstract
+namespace OpenQuery.Core.Abstract.Tokens
 {
     internal abstract class WhereTokenBase<TSource, T> : TokenBase
     {

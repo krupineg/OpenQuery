@@ -1,11 +1,11 @@
 using System.Reflection;
 
-namespace OpenQuery.Core
+namespace OpenQuery.Core.Reflection
 {
     public static class QueryFieldsCache
     {
         private static readonly Dictionary<Type, ISet<string>> Props = new();
-        private static readonly object Lock = new object();
+        private static readonly object Lock = new ();
 
         public static ISet<string> GetProperties(Type type)
         {

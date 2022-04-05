@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using OpenQuery.Core;
 using OpenQuery.Core.Extensions;
+using OpenQuery.Core.Reflection;
 using OpenQuery.SQLite;
 
 namespace OpenQuery.Test

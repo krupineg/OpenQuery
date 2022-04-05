@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿
+using OpenQuery.Core.Abstract.Dialect;
 
-namespace OpenQuery.Core.Abstract
+namespace OpenQuery.Core.Abstract.Tokens
 {
     public abstract class TokenBase
     {

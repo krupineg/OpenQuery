@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace OpenQuery.Core
+namespace OpenQuery.Core.Reflection
 {
     public static class PropertyExtractor
     {

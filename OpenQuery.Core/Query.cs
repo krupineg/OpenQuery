@@ -1,6 +1,8 @@
 using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Dialect;
+using OpenQuery.Core.Abstract.Query;
 
-    //[assembly: System.Reflection.AssemblyVersion("0.0.*")]
+//[assembly: System.Reflection.AssemblyVersion("0.0.*")]
 namespace OpenQuery.Core
 {
     public static class Query

@@ -1,7 +1,7 @@
 using System.Text;
-using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Dialect;
 
-namespace OpenQuery.Core;
+namespace OpenQuery.Core.Dialects;
 
 public class Default : ISqlDialect
 {
