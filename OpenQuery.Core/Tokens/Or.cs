@@ -5,15 +5,11 @@ using OpenQuery.Core.Abstract.Tokens;
 
 namespace OpenQuery.Core.Tokens
 {
-    internal class Or : TokenBase
+    internal class Or : IToken
     {
-        public override string Build()
+        public string Build(ISqlDialect dialect)
         {
-            return Dialect.Or;
-        }
-
-        public Or(ISqlDialect dialect) : base(dialect)
-        {
+            return dialect.Or;
         }
     }
 }

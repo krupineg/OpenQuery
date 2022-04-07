@@ -1,9 +1,9 @@
-using OpenQuery.Core.Abstract.Tokens;
+using OpenQuery.Core.Abstract.Clauses.Where;
 
 namespace OpenQuery.Core.Abstract.Query
 {
     public interface IWhereQuery : IQueryBase
     {
-        IQuery Where(TokenBase where);
+        IQuery Where(WhereFactoryExpression where);
     }
 }

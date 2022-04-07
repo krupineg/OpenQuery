@@ -1,9 +1,8 @@
 using System.Linq.Expressions;
-using System.Text;
 using OpenQuery.Core.Abstract.Clauses.From;
 using OpenQuery.Core.Abstract.Clauses.Select;
+using OpenQuery.Core.Abstract.Clauses.Where;
 using OpenQuery.Core.Abstract.Query;
-using OpenQuery.Core.Reflection;
 using OpenQuery.Core.Tokens;
 
 namespace OpenQuery.Core.Extensions
@@ -18,11 +17,7 @@ namespace OpenQuery.Core.Extensions
         public static IAvailableNewWhereClause AreEqual<TSource, TProperty>(this IAvailableWhereQuery query,
             Expression<Func<TSource, TProperty>> func, TProperty value)
         {
-            query.Cast<IWhereQuery>()
-                .Where(new WhereEqual<TSource, TProperty>(
-                    query.Cast<IQueryBaseHidden>().Dialect, 
-                    PropertyExtractor.GetPropertyInfo(func).Name, 
-                    value));
+            query.Cast<IWhereQuery>().Where(factory => new WhereEqual<TProperty>(factory.Property(func), value));
             return query.Cast<IAvailableNewWhereClause>();
         }
         
@@ -63,19 +58,21 @@ namespace OpenQuery.Core.Extensions
             (this IAvailableWhereQuery query, Expression<Func<TSource, TProperty>> func, TProperty value)
         {
             query.Cast<IWhereQuery>()
-                .Where(new WhereGreater<TSource, TProperty>(query.Cast<IQueryBaseHidden>().Dialect,
-                    PropertyExtractor.GetPropertyInfo(func).Name,
-                    value));
+                .Where(factory => new WhereGreater<TProperty>(factory.Property(func), value));
             return query.Cast<IAvailableNewWhereClause>();
         }
 
         public static IAvailableNewWhereClause IsLess<TSource, TProperty>
             (this IAvailableWhereQuery query, Expression<Func<TSource, TProperty>> func, TProperty value)
         {
-            query.Cast<IWhereQuery>()
-                .Where(new WhereLess<TSource, TProperty>(query.Cast<IQueryBaseHidden>().Dialect,
-                    PropertyExtractor.GetPropertyInfo(func).Name, 
-                    value));
+            query.Cast<IWhereQuery>().Where(factory => new WhereLess<TProperty>(factory.Property(func), value));
+            return query.Cast<IAvailableNewWhereClause>();
+        }
+        
+        public static IAvailableNewWhereClause IsLess<TProperty>
+            (this IAvailableWhereQuery query, Func<IWhereClauseFactory, WhereExpression> expression, TProperty value)
+        {
+            query.Cast<IWhereQuery>().Where(factory => new WhereLess<TProperty>(expression(factory), value));
             return query.Cast<IAvailableNewWhereClause>();
         }
 
@@ -84,14 +81,7 @@ namespace OpenQuery.Core.Extensions
                 Expression<Func<TSource, TProperty>> func,
                 params TProperty[] value)
         {
-            var sb = new StringBuilder();
-            sb.Append(
-                query.Cast<IQueryBaseHidden>().Dialect.CreateIn(value));
-            var right = sb.ToString();
-            query.Cast<IWhereQuery>()
-                .Where(new WhereIn<TSource, string>(query.Cast<IQueryBaseHidden>().Dialect,
-                    PropertyExtractor.GetPropertyInfo(func).Name,
-                    right));
+            query.Cast<IWhereQuery>().Where(factory => new WhereIn<TProperty>(factory.Property(func), value));
             return query.Cast<IAvailableNewWhereClause>();
         }
 
@@ -99,24 +89,14 @@ namespace OpenQuery.Core.Extensions
             (this IAvailableWhereQuery query, Expression<Func<TSource, TProperty>> func,
                 params TProperty[] value)
         {
-            var sb = new StringBuilder();
-            sb.Append(
-                query.Cast<IQueryBaseHidden>().Dialect.CreateIn(value));
-            var right = sb.ToString();
-            query.Cast<IWhereQuery>()
-                .Where(new WhereNotIn<TSource, string>(query.Cast<IQueryBaseHidden>().Dialect,
-                    PropertyExtractor.GetPropertyInfo(func).Name, 
-                    right));
+            query.Cast<IWhereQuery>().Where(factory => new WhereNotIn<TProperty>(factory.Property(func), value));
             return query.Cast<IAvailableNewWhereClause>();
         }
 
         public static IAvailableNewWhereClause IsLike<TSource>
             (this IAvailableWhereQuery query, Expression<Func<TSource, string>> func, string value)
         {
-            query.Cast<IWhereQuery>()
-                .Where(new WhereLike<TSource, string>(query.Cast<IQueryBaseHidden>().Dialect,
-                    PropertyExtractor.GetPropertyInfo(func).Name,
-                    $"'{value}'"));
+            query.Where(factory => new WhereLike(factory.Property(func), value));
             return query.Cast<IAvailableNewWhereClause>();
         }
         

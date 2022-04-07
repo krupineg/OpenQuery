@@ -1,6 +1,6 @@
 namespace OpenQuery.Core.Abstract.Query
 {
-    public interface IAvailableWhereQuery : IQueryBase
+    public interface IAvailableWhereQuery : IQueryBase, IWhereQuery
     {
     }
 }

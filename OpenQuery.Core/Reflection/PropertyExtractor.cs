@@ -8,26 +8,19 @@ namespace OpenQuery.Core.Reflection
         public static PropertyInfo GetPropertyInfo<TSource, TProperty>(
             Expression<Func<TSource, TProperty>> propertyLambda)
         {
-            TypeInfo type = typeof(TSource).GetTypeInfo();
+            var type = typeof(TSource).GetTypeInfo();
 
-            MemberExpression member = propertyLambda.Body as MemberExpression;
+            var member = propertyLambda.Body as MemberExpression;
             if (member == null)
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a method, not a property.",
-                    propertyLambda.ToString()));
+                throw new ArgumentException($"Expression '{propertyLambda}' refers to a method, not a property.");
 
-            PropertyInfo propInfo = (member.Member as PropertyInfo);
+            var propInfo = (member.Member as PropertyInfo);
             if (propInfo == null)
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a field, not a property.",
-                    propertyLambda.ToString()));
+                throw new ArgumentException($"Expression '{propertyLambda}' refers to a field, not a property.");
 
             if (type != propInfo.DeclaringType.GetTypeInfo() &&
                 !type.IsSubclassOf(propInfo.DeclaringType))
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a property that is not from type {1}.",
-                    propertyLambda.ToString(),
-                    type));
+                throw new ArgumentException($"Expression '{propertyLambda}' refers to a property that is not from type {type}.");
 
             return propInfo;
         }

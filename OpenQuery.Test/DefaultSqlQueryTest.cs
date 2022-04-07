@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using OpenQuery.Core;
-using OpenQuery.Core.Abstract;
 using OpenQuery.Core.Abstract.Query;
 using OpenQuery.Core.Dialects;
 using Assert = NUnit.Framework.Assert;
@@ -152,7 +151,31 @@ namespace OpenQuery.Test
             Assert.That(defaultSelect, 
                 Is.EqualTo("SELECT Id, Name FROM Model WHERE Id < 1"));
         }
-
+        
+        [Test]
+        public void SelectWhereLessThanFunctionalTest()
+        {
+            var defaultSelect = _query.Select(x => x.Fields("Id", "Name"))
+                .From<Model>()
+                .Where()
+                .IsLess(p => p.Function("rand"), 0.01)
+                .Build();
+            Assert.That(defaultSelect, 
+                Is.EqualTo("SELECT Id, Name FROM Model WHERE rand() < 0.01"));
+        }
+        
+        [Test]
+        public void SelectWhereLessThanFunctionalTestWithArgument()
+        {
+            var defaultSelect = _query.Select(x => x.Fields("Id", "Name"))
+                .From<Model>()
+                .Where()
+                .IsLess(p => p.Function("functionName", "1"), 0.01)
+                .Build();
+            Assert.That(defaultSelect, 
+                Is.EqualTo("SELECT Id, Name FROM Model WHERE functionName(1) < 0.01"));
+        }
+        
         [Test]
         public void SelectWhereLikeSimpleTest()
         {

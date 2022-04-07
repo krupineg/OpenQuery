@@ -1,11 +1,17 @@
 using System.Diagnostics.Contracts;
-using System.Text;
 using OpenQuery.Core.Abstract.Clauses.Select;
 
 namespace OpenQuery.Core.Clauses;
 
 internal sealed class SelectClauseFactory : ISelectClauseFactory
 {
+    private readonly FunctionCallClauseFactory _functionCallClauseFactory;
+
+    public SelectClauseFactory(FunctionCallClauseFactory functionCallClauseFactory)
+    {
+        _functionCallClauseFactory = functionCallClauseFactory;
+    }
+    
     public SelectExpression Everything()
     {
         return (dialect, _) => dialect.WildCard;
@@ -20,11 +26,7 @@ internal sealed class SelectClauseFactory : ISelectClauseFactory
 
     public SelectExpression Function(string function, params string[] arguments)
     {
-        return (dialect, _) => new StringBuilder(function)
-            .Append(dialect.OpenSubquery)
-            .Append(dialect.JoinFields(arguments))
-            .Append(dialect.CloseSubquery)
-            .ToString();
+        return (dialect, _) => _functionCallClauseFactory.Build(dialect, function, arguments);
     }
             
     public SelectExpression Count()

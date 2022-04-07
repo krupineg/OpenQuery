@@ -1,23 +1,23 @@
 using System.Text;
-using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Clauses.Where;
 using OpenQuery.Core.Abstract.Dialect;
 using OpenQuery.Core.Abstract.Tokens;
 
 namespace OpenQuery.Core.Tokens
 {
-    internal class WhereGreater<TSource, T> : WhereTokenBase<TSource, T>
+    internal class WhereGreater<T> : WhereToken<T>
     {
-        internal WhereGreater(ISqlDialect dialect, string name, T val)
-            : base(dialect, name, val)
+        internal WhereGreater(WhereExpression whereExpression, T val)
+            : base(whereExpression, val)
         {
         }
 
-        public override StringBuilder GetSign()
+        protected override StringBuilder GetSign(ISqlDialect dialect)
         {
             return new StringBuilder()
-                .Append(Dialect.WhiteSpace)
-                .Append(Dialect.Greater)
-                .Append(Dialect.WhiteSpace);
+                .Append(dialect.WhiteSpace)
+                .Append(dialect.Greater)
+                .Append(dialect.WhiteSpace);
         }
     }
 }

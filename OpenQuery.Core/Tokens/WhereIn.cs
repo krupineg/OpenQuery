@@ -1,23 +1,29 @@
 using System.Text;
 using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Clauses.Where;
 using OpenQuery.Core.Abstract.Dialect;
 using OpenQuery.Core.Abstract.Tokens;
 
 namespace OpenQuery.Core.Tokens
 {
-    internal class WhereIn<TSource, T> : WhereTokenBase<TSource, T>
+    internal class WhereIn<T> : WhereToken<T[]>
     {
-        internal WhereIn(ISqlDialect dialect, string name, T val)
-            : base(dialect, name, val)
+        internal WhereIn(WhereExpression whereExpression, T[] val)
+            : base(whereExpression, val)
         {
         }
-
-        public override StringBuilder GetSign()
+        
+        protected override string ValueToString(T[] value, ISqlDialect dialect)
+        {
+            return dialect.CreateIn(value.Select(x => x.ToString()).ToArray()).ToString();
+        }
+        
+        protected override StringBuilder GetSign(ISqlDialect dialect)
         {
             return new StringBuilder()
-                .Append(Dialect.WhiteSpace)
-                .Append(Dialect.In)
-                .Append(Dialect.WhiteSpace);
+                .Append(dialect.WhiteSpace)
+                .Append(dialect.In)
+                .Append(dialect.WhiteSpace);
         }
     }
 }

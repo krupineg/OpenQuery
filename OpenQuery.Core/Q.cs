@@ -2,6 +2,7 @@ using System.Diagnostics.Contracts;
 using System.Text;
 using OpenQuery.Core.Abstract.Clauses.From;
 using OpenQuery.Core.Abstract.Clauses.Select;
+using OpenQuery.Core.Abstract.Clauses.Where;
 using OpenQuery.Core.Abstract.Dialect;
 using OpenQuery.Core.Abstract.Query;
 using OpenQuery.Core.Abstract.Tokens;
@@ -21,9 +22,16 @@ namespace OpenQuery.Core
         IQueryHidden
         where TDialect: ISqlDialect, new()
     {
+        private readonly ISelectClauseFactory _selectClauseFactory =
+            new SelectClauseFactory(new FunctionCallClauseFactory());
+        private readonly IWhereClauseFactory _whereClauseFactory =
+            new WhereClauseFactory(new FunctionCallClauseFactory());
+
+        private readonly IFromClauseFactory _fromClauseFactory = new FromClauseFactory();
+        
         private readonly TDialect _dialect;
         private readonly List<FromExpression> _sourceExpressions = new();
-        private readonly ICollection<TokenBase> _whereTokens = new List<TokenBase>();
+        private readonly ICollection<IToken> _whereTokens = new List<IToken>();
         private readonly List<SelectExpression> _selectExpressions = new ();
         private readonly ISet<string> _alias = new HashSet<string>();
         private readonly ISet<long> _limits = new HashSet<long>();
@@ -34,38 +42,38 @@ namespace OpenQuery.Core
             _dialect = new TDialect();
         }
         
-        public ISelectedQuery Select<T>(Func<SelectClauseFactory, SelectExpression> func)
+        public ISelectedQuery Select<T>(Func<ISelectClauseFactory, SelectExpression> func)
         {
-            _selectExpressions.Add(func(new SelectClauseFactory()));
+            _selectExpressions.Add(func(_selectClauseFactory));
             return this;
         }
         
         public ISelectedQuery Select(Func<ISelectClauseFactory, SelectExpression> expression)
         {
-            _selectExpressions.Add(expression(new SelectClauseFactory()));
+            _selectExpressions.Add(expression(_selectClauseFactory));
             return this;
         }
         public IAvailableWhereQuery From(Func<IFromClauseFactory, FromExpression> func)
         {
-            _sourceExpressions.Add(func(new FromClauseFactory())); 
+            _sourceExpressions.Add(func(_fromClauseFactory)); 
             return this;
         }
 
-        public IQuery Where(TokenBase where)
+        public IQuery Where(WhereFactoryExpression where)
         {
-            _whereTokens.Add(where);
+            _whereTokens.Add(where(_whereClauseFactory));
             return this;
         }
 
         public IQuery AndWhere()
         {
-            _whereTokens.Add(new And(_dialect));
+            _whereTokens.Add(new And());
             return this;
         }
 
         public IQuery OrWhere()
         {
-            _whereTokens.Add(new Or(_dialect));
+            _whereTokens.Add(new Or());
             return this;
         }
 
@@ -118,7 +126,7 @@ namespace OpenQuery.Core
             {
                 foreach (var whereToken in _whereTokens)
                 {
-                    sb.Append(_dialect.WhiteSpace).Append(whereToken.Build());
+                    sb.Append(_dialect.WhiteSpace).Append(whereToken.Build(_dialect));
                 }
             }
             if (sb.Length > 0)

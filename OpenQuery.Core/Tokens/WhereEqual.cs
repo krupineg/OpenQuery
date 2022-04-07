@@ -1,23 +1,24 @@
 using System.Text;
 using OpenQuery.Core.Abstract;
+using OpenQuery.Core.Abstract.Clauses.Where;
 using OpenQuery.Core.Abstract.Dialect;
 using OpenQuery.Core.Abstract.Tokens;
 
 namespace OpenQuery.Core.Tokens
 {
-    internal class WhereEqual<TSource, T> : WhereTokenBase<TSource, T>
+    internal class WhereEqual<T> : WhereToken<T>
     {
-        internal WhereEqual(ISqlDialect dialect, string name, T val) 
-            : base(dialect, name, val)
+        internal WhereEqual(WhereExpression whereExpression, T val) 
+            : base(whereExpression, val)
         {
         }
 
-        public override StringBuilder GetSign()
+        protected override StringBuilder GetSign(ISqlDialect dialect)
         {
             return new StringBuilder()
-                .Append(Dialect.WhiteSpace)
-                .Append(Dialect.IsEqual)
-                .Append(Dialect.WhiteSpace);
+                .Append(dialect.WhiteSpace)
+                .Append(dialect.IsEqual)
+                .Append(dialect.WhiteSpace);
         }
     }
 }
