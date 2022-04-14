@@ -25,6 +25,7 @@ namespace OpenQuery.Core.Abstract.Dialect
         string Alias { get; }
         string Limit { get; }
         string Offset { get; }
+        string QuoteValue(string value);
         StringBuilder CreateIn<T>(T[] value);
         string JoinFields(IReadOnlyCollection<string> fields);
     }

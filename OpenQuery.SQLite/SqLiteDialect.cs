@@ -28,6 +28,11 @@ namespace OpenQuery.SQLite
         public string Limit => "LIMIT";
         public string Offset => "OFFSET";
 
+        public string QuoteValue(string value)
+        {
+            return $"'{value}'";
+        }
+
         public StringBuilder CreateIn<T>(T[] value)
         {
             var sb = new StringBuilder();

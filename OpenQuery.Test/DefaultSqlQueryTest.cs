@@ -44,6 +44,26 @@ namespace OpenQuery.Test
             Assert.That(defaultSelect,
                 Is.EqualTo("SELECT Id, Name FROM Model"));
         }
+
+        [Test]
+        public void SelectFields()
+        {
+            var query =  _query
+                .Select(x => x.Fields("Infinitive"))
+                .From(x => x.WithTableName<Obj>("fully_qualified.table_name"))
+                .Where().AreEqual<Obj>(o => o.Id, "text")
+                .Limit(2)
+                .Offset(1)
+                .Build();
+            
+            Assert.AreEqual("SELECT Infinitive FROM fully_qualified.table_name WHERE Id = 'text' LIMIT 2 OFFSET 1", query);
+        }
+
+        class Obj
+        {
+            public string Infinitive { get; set; }
+            public string Id { get; init; }
+        }
         
         [Test]
         public void TableNameShouldBeOverridable()
@@ -91,6 +111,7 @@ namespace OpenQuery.Test
             Assert.That(defaultSelect, 
                 Is.EqualTo("SELECT * FROM (SELECT Id FROM Model) AS a WHERE Id = 1"));
         }
+        
         [Test]
         public void SelectWhereEqualsSimpleTest()
         {
@@ -101,6 +122,18 @@ namespace OpenQuery.Test
                 .Build();
             Assert.That(defaultSelect, 
                 Is.EqualTo("SELECT Id, Name FROM Model WHERE Id = 1"));
+        }
+        
+        [Test]
+        public void SelectWhereTrue()
+        {
+            var defaultSelect = _query.Select(x => x.Everything())
+                .From<Model>()
+                .Where()
+                .True()
+                .Build();
+            Assert.That(defaultSelect, 
+                Is.EqualTo("SELECT * FROM Model WHERE 1 = 1"));
         }
         
         [Test]
@@ -239,6 +272,18 @@ namespace OpenQuery.Test
                 Is.EqualTo("SELECT Id, Name FROM Model WHERE Name = 'somename' AND Id < 2"));
         }
         
+        [Test]
+        public void SelectWhereEqualGenerics()
+        {
+            var defaultSelect = _query.Select(x => x.Fields("Id", "Name"))
+                .From<Model>()
+                .Where().AreEqual<Model, string>(x => x.Name, "somename")
+                .And()
+                .IsLess<Model, int>(x => x.Id, 2)
+                .Build();
+            Assert.That(defaultSelect, 
+                Is.EqualTo("SELECT Id, Name FROM Model WHERE Name = 'somename' AND Id < 2"));
+        }
         [Test]
         public void SelectCount()
         {

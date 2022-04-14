@@ -9,7 +9,7 @@ internal sealed class FromClauseFactory : IFromClauseFactory
 {
     public FromExpression WithTableName<T>(string alias)
     {
-        return CreateExpression<Object>(alias, Array.Empty<string>());
+        return CreateExpression<T>(alias, Array.Empty<string>());
     }
     
     public FromExpression Default<T>()

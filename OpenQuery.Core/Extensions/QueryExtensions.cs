@@ -21,10 +21,16 @@ namespace OpenQuery.Core.Extensions
             return query.Cast<IAvailableNewWhereClause>();
         }
         
+        public static IAvailableNewWhereClause True(this IAvailableWhereQuery query)
+        {
+            query.Cast<IWhereQuery>().Where(factory => new WhereEqual<byte>(factory.Literal(1), 1));
+            return query.Cast<IAvailableNewWhereClause>();
+        }
+        
         public static IAvailableNewWhereClause AreEqual<TSource>(this IAvailableWhereQuery query,
             Expression<Func<TSource, string>> func, string value)
         {
-            return AreEqual<TSource, string>(query, func, $"'{value}'");
+            return AreEqual<TSource, string>(query, func, value);
         }
         
         public static IAvailableNewWhereClause AreEqual<TSource>(this IAvailableWhereQuery query,

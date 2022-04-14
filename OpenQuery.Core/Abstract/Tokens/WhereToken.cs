@@ -19,7 +19,8 @@ namespace OpenQuery.Core.Abstract.Tokens
 
         protected virtual string ValueToString(T value, ISqlDialect dialect)
         {
-            return value.ToString();
+            var stringValue = value.ToString();
+            return typeof(T) == typeof(string) ? dialect.QuoteValue(stringValue) : stringValue;
         }
         
         public string Build(ISqlDialect dialect)

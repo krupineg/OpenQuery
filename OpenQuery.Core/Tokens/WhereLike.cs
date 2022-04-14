@@ -9,7 +9,7 @@ namespace OpenQuery.Core.Tokens
     internal class WhereLike : WhereToken<string>
     {
         internal WhereLike(WhereExpression whereExpression, string val)
-            : base(whereExpression, $"'{val}'")
+            : base(whereExpression, val)
         {
         }
 

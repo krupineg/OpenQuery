@@ -13,7 +13,12 @@ class WhereClauseFactory : IWhereClauseFactory
     {
         _functionCallClauseFactory = functionCallClauseFactory;
     }
-    
+
+    public WhereExpression Literal<T>(T value)
+    {
+        return dialect => typeof(T) == typeof(string) ? dialect.QuoteValue(value.ToString()) : value.ToString();
+    }
+
     public WhereExpression Function(string name, params string[] parameters)
     {
         return (dialect) => _functionCallClauseFactory.Build(dialect, name, parameters);

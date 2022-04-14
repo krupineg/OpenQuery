@@ -26,6 +26,10 @@ public class Default : ISqlDialect
     public string Alias => "AS";
     public string Limit => "LIMIT";
     public string Offset => "OFFSET";
+    public string QuoteValue(string value)
+    {
+        return $"'{value}'";
+    }
 
     public StringBuilder CreateIn<T>(T[] value)
     {

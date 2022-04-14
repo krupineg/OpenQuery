@@ -6,6 +6,7 @@ namespace OpenQuery.Core.Abstract.Clauses.Where;
 
 public interface IWhereClauseFactory
 {
+    WhereExpression Literal<T>(T value);
     WhereExpression Function(string name, params string[] parameters);
     WhereExpression Property<T, TProperty>(Expression<Func<T, TProperty>> property);
 }
